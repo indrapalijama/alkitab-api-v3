@@ -44,8 +44,8 @@ accesskey: your_api_key_here
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/alkitab-api-rust.git
-   cd alkitab-api-rust
+   git clone https://github.com/indrapalijama/alkitab-api-v3.git
+   cd alkitab-api-v3
    ```
 
 2. Create a `.env` file in the root directory with the following content:

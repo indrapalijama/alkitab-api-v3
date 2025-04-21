@@ -11,6 +11,9 @@ use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use middleware::auth::Auth;
 use config::CONFIG;
+use alkitab_api_rust::api_docs::ApiDoc;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("soli deo gloria")
@@ -30,18 +33,10 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         // Configure CORS
-        let mut cors = Cors::default();
-        
-        // Add allowed origins
-        for origin in &CONFIG.server.cors_allowed_origins {
-            cors = cors.allowed_origin(origin);
-        }
-        
-        // Add other CORS settings
-        cors = cors
-            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
-            .allow_any_header()
-            .supports_credentials();
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allow_any_method()
+            .allow_any_header();
 
         App::new()
             .wrap(cors)
@@ -50,6 +45,10 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/bible")
                     .wrap(Auth)
                     .configure(routes::bible::config),
+            )
+            .service(
+                SwaggerUi::new("/swagger-ui/{_:.*}")
+                    .url("/api-docs/openapi.json", ApiDoc::openapi())
             )
             // .service(
             //     web::scope("/reflection")

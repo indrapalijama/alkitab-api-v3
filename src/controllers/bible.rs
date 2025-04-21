@@ -1,25 +1,53 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{get, web, HttpResponse};
+#[allow(unused_imports)]
+use crate::models::bible::{BibleMetadata, BibleChapter, ErrorResponse};
+use crate::services::bible;
 use crate::error::AppError;
-use crate::services::bible::BibleService;
 
-pub async fn find(book: web::Path<String>) -> Result<HttpResponse, AppError> {
-    let bible_service = BibleService::new();
-    let formatted_book_name = bible_service.format_book_name(&book)?;
-    let metadata = bible_service.find_book_metadata(&formatted_book_name).await?;    
-    Ok(HttpResponse::Ok().json(metadata))
+#[utoipa::path(
+    get,
+    path = "/bible/find/{book}",
+    responses(
+        (status = 200, description = "Get Bible book metadata", body = BibleMetadata),
+        (status = 400, description = "Bad Request", body = ErrorResponse),
+        (status = 404, description = "Not Found", body = ErrorResponse),
+        (status = 500, description = "Internal Server Error", body = ErrorResponse)
+    ),
+    params(
+        ("book" = String, Path, description = "Book name")
+    ),
+    security(
+        ("accesskey" = [])
+    )
+)]
+#[get("/find/{book}")]
+pub async fn find(path: web::Path<String>) -> Result<HttpResponse, AppError> {
+    let book = path.into_inner().trim().to_string();
+    let result = bible::find(&book).await?;
+    Ok(HttpResponse::Ok().json(result))
 }
 
-#[derive(serde::Deserialize)]
-pub struct ReadQuery {
-    version: Option<String>,
-}
-
-pub async fn read(path: web::Path<(String, i32)>, query: web::Query<ReadQuery>) -> Result<HttpResponse, AppError> {
+#[utoipa::path(
+    get,
+    path = "/bible/read/{book}/{chapter}",
+    responses(
+        (status = 200, description = "Get Bible chapter content", body = BibleChapter),
+        (status = 400, description = "Bad Request", body = ErrorResponse),
+        (status = 404, description = "Not Found", body = ErrorResponse),
+        (status = 500, description = "Internal Server Error", body = ErrorResponse)
+    ),
+    params(
+        ("book" = String, Path, description = "Book name"),
+        ("chapter" = i32, Path, description = "Chapter number")
+    ),
+    security(
+        ("accesskey" = [])
+    )
+)]
+#[get("/read/{book}/{chapter}")]
+pub async fn read(path: web::Path<(String, i32)>) -> Result<HttpResponse, AppError> {
     let (book, chapter) = path.into_inner();
-    
-    let bible_service = BibleService::new();
-    let formatted_book_name = bible_service.format_book_name(&book)?;
-    let chapter_data = bible_service.get_chapter(&formatted_book_name, &chapter.to_string(), query.version.as_deref().unwrap_or("tb")).await?;
-    
-    Ok(HttpResponse::Ok().json(chapter_data))
+    let book = book.trim().to_string();
+    let result = bible::read(&book, chapter).await?;
+    Ok(HttpResponse::Ok().json(result))
 }

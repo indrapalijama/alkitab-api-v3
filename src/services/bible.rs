@@ -362,4 +362,16 @@ impl BibleService {
         Ok(format!("{}{}", first_char, rest))
     }
 
+}
+
+pub async fn find(book: &str) -> Result<BibleMetadata, AppError> {
+    let bible_service = BibleService::new();
+    let formatted_book_name = bible_service.format_book_name(book.trim())?;
+    bible_service.find_book_metadata(&formatted_book_name).await
+}
+
+pub async fn read(book: &str, chapter: i32) -> Result<BibleChapter, AppError> {
+    let bible_service = BibleService::new();
+    let formatted_book_name = bible_service.format_book_name(book.trim())?;
+    bible_service.get_chapter(&formatted_book_name, &chapter.to_string(), "tb").await
 } 

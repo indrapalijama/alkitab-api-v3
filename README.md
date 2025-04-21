@@ -129,7 +129,7 @@ k6 run read_test.js
 - [ ] **Response Caching**: Add caching layer for frequently accessed content
 - [ ] **Verse of the Day**: Add endpoint to fetch random/daily verses
 - [ ] **Webhook Support**: Allow users to subscribe to daily verse notifications
-- [ ] **OpenAPI Documentation**: Generate comprehensive API documentation using OpenAPI/Swagger
+- [x]  **OpenAPI Documentation**: Generate comprehensive API documentation using OpenAPI/Swagger
 
 ## License
 

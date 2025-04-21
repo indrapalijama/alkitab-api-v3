@@ -105,18 +105,6 @@ alkitab-api-rust/
 cargo test
 ```
 
-### Load Testing
-
-The project includes k6 load testing scripts:
-
-- `read_test.js` - Tests the `/bible/read/{book}/{chapter}` endpoint
-- `find-test.js` - Tests the `/bible/find/{book}` endpoint
-
-To run the load tests:
-
-```bash
-k6 run read_test.js
-```
 
 ## To-Do
 

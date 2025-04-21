@@ -118,6 +118,19 @@ To run the load tests:
 k6 run read_test.js
 ```
 
+## To-Do
+
+- [ ] **Verse Range Support**: Add ability to fetch specific verse ranges (e.g., `/bible/read/John/3/16-21`)
+- [ ] **Cross-References**: Implement endpoint to fetch cross-references for specific verses
+- [ ] **Search Functionality**: Add text search capabilities across all translations
+- [ ] **Parallel View**: Support fetching multiple translations side by side
+- [ ] **Commentary Integration**: Add support for Bible commentaries
+- [ ] **API Rate Limiting**: Implement rate limiting for better resource management
+- [ ] **Response Caching**: Add caching layer for frequently accessed content
+- [ ] **Verse of the Day**: Add endpoint to fetch random/daily verses
+- [ ] **Webhook Support**: Allow users to subscribe to daily verse notifications
+- [ ] **OpenAPI Documentation**: Generate comprehensive API documentation using OpenAPI/Swagger
+
 ## License
 
 [MIT License](LICENSE)

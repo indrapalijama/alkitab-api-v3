@@ -6,8 +6,7 @@ use lazy_static::lazy_static;
 #[derive(Debug, Deserialize, Clone)]
 pub struct ServerConfig {
     pub host: String,
-    pub port: u16,
-    pub cors_allowed_origins: Vec<String>,
+    pub port: u16
 }
 
 #[derive(Debug, Deserialize, Clone)]

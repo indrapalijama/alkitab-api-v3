@@ -4,10 +4,10 @@ use alkitab_api_rust::error::AppError;
 #[tokio::test]
 async fn test_find_book_metadata() {
     let service = BibleService::new();
-    let result = service.find_book_metadata("Genesis").await;
+    let result = service.find_book_metadata("Kejadian").await;
     assert!(result.is_ok());
     let metadata = result.unwrap();
-    assert_eq!(metadata.book, "Genesis");
+    assert_eq!(metadata.book, "Kejadian");
     assert!(metadata.total_verse > 0);
     assert!(!metadata.verses.is_empty());
 }
@@ -15,7 +15,7 @@ async fn test_find_book_metadata() {
 #[tokio::test]
 async fn test_get_chapter() {
     let service = BibleService::new();
-    let result = service.get_chapter("Genesis", "1", "tb").await;
+    let result = service.get_chapter("Kejadian", "1", "tb").await;
     assert!(result.is_ok());
     let chapter = result.unwrap();
     assert_eq!(chapter.book, vec!["Kejadian"]);

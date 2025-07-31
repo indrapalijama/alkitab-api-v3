@@ -51,4 +51,4 @@ jobs:
       run: shuttle login --api-key ${{ secrets.SHUTTLE_API_KEY }}
 
     - name: Deploy
-      run: shuttle deploy
+      run: shuttle deploy --no-follow

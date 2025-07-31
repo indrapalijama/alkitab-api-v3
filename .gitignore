@@ -20,6 +20,6 @@ logs/
 # Backup files
 *.bak
 *.backup
-*~
-.shuttle*
+
+# Secrets
 Secrets*.toml

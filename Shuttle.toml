@@ -3,6 +3,7 @@ name = "alkitab_api_rust"
 
 [deploy]
 include = ["config/*.toml"]
+deny_dirty = true
 
 [build]
 assets = ["config/*.toml"]

@@ -10,11 +10,6 @@ Cargo.lock
 .env.test.local
 .env.production.local
 
-# Configuration
-config/default.toml
-config/development.toml
-config/production.toml
-
 # IDE and editor files
 .idea/
 .vscode/

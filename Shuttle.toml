@@ -5,3 +5,6 @@ name = "alkitab_api_rust"
 include = [
     "config/*"
 ]
+assets = [
+  "config/*"
+]

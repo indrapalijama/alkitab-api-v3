@@ -2,6 +2,7 @@
 name = "alkitab_api_rust"
 
 [deploy]
-assets = [
-  "config/*"
-]
+include = ["config/*.toml"]
+
+[build]
+assets = ["config/*.toml"]

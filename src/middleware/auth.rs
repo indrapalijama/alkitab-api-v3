@@ -6,9 +6,16 @@ use actix_web::{
 use futures::future::{ok, Ready};
 use std::future::{ready, Future};
 use std::pin::Pin;
-use std::env;
 
-pub struct Auth;
+pub struct Auth {
+    secret: String,
+}
+
+impl Auth {
+    pub fn new(secret: String) -> Self {
+        Self { secret }
+    }
+}
 
 impl<S, B> Transform<S, ServiceRequest> for Auth
 where
@@ -23,12 +30,16 @@ where
     type Future = Ready<Result<Self::Transform, Self::InitError>>;
 
     fn new_transform(&self, service: S) -> Self::Future {
-        ok(AuthMiddleware { service })
+        ok(AuthMiddleware { 
+            service,
+            secret: self.secret.clone(),
+        })
     }
 }
 
 pub struct AuthMiddleware<S> {
     service: S,
+    secret: String,
 }
 
 impl<S, B> Service<ServiceRequest> for AuthMiddleware<S>
@@ -49,25 +60,10 @@ where
             .and_then(|h| h.to_str().ok())
             .map(|s| s.trim());
         
-        // Check if SECRET environment variable is set
-        let secret = match env::var("SECRET") {
-            Ok(secret) => secret,
-            Err(_) => {
-                println!("ERROR: SECRET environment variable is not set. Please set it in your .env file.");
-                return Box::pin(async move {
-                    Err(ErrorUnauthorized("Server configuration error: SECRET not set"))
-                });
-            }
-        };
-
         // Check if the token matches the secret
         if let Some(token_str) = token {
-            if token_str == secret {
-                let fut = self.service.call(req);
-                return Box::pin(async move {
-                    let res = fut.await?;
-                    Ok(res)
-                });
+            if token_str == self.secret {
+                return Box::pin(self.service.call(req));
             }
         }
 

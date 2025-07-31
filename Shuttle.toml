@@ -1,0 +1,10 @@
+[project]
+name = "alkitab_api_rust"
+
+[deploy]
+assets = [
+    "config/*"
+]
+include = [
+    "config/*"
+]

@@ -11,7 +11,9 @@ Cargo.lock
 .env.production.local
 
 # Configuration
-config/local.toml
+config/default.toml
+config/development.toml
+config/production.toml
 
 # IDE and editor files
 .idea/
@@ -31,3 +33,5 @@ logs/
 *.bak
 *.backup
 *~
+.shuttle*
+Secrets*.toml

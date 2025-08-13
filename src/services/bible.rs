@@ -113,7 +113,7 @@ impl BibleService {
         cleaned.split_whitespace().collect::<Vec<&str>>().join(" ")
     }
 
-    pub async fn get_chapter(&self, book: &str, chapter: &str, version: &str) -> Result<BibleChapter, AppError> {
+pub async fn get_chapter(&self, book: &str, chapter: &str, version: &str) -> Result<BibleChapter, AppError> {
         let book_lower = book.to_lowercase();
         let indonesian_book_name = {
             if let Some(name) = INDONESIAN_TO_SHORT.iter()
@@ -254,17 +254,19 @@ impl BibleService {
             let mut last_verse_number: Option<i32> = None;
             
             for element in document.select(&selector) {
-                // Try to find paragraph titles if they exist
-                if let Some(title_span) = element.select(&Selector::parse("span.paragraphtitle").unwrap()).next() {
-                    if let Some(title_text) = title_span.text().next() {
-                        let title_text = title_text.trim();
-                        if !title_text.is_empty() {
-                            if let (Some(prev_title), Some(start_verse)) = (current_title.take(), current_start_verse.take()) {
-                                if let Some(last_verse) = last_verse_number {
-                                    titles_with_ranges.push(format!("{} ({}-{})", prev_title, start_verse, last_verse));
+                // Only process paragraph titles for "tb" version
+                if version == "tb" {
+                    if let Some(title_span) = element.select(&Selector::parse("span.paragraphtitle").unwrap()).next() {
+                        if let Some(title_text) = title_span.text().next() {
+                            let title_text = title_text.trim();
+                            if !title_text.is_empty() {
+                                if let (Some(prev_title), Some(start_verse)) = (current_title.take(), current_start_verse.take()) {
+                                    if let Some(last_verse) = last_verse_number {
+                                        titles_with_ranges.push(format!("{} ({}-{})", prev_title, start_verse, last_verse));
+                                    }
                                 }
+                                current_title = Some(title_text.to_string());
                             }
-                            current_title = Some(title_text.to_string());
                         }
                     }
                 }
@@ -285,7 +287,8 @@ impl BibleService {
                                 .unwrap_or(1)
                         };
 
-                        if current_start_verse.is_none() {
+                        // Only track title ranges for "tb" version
+                        if version == "tb" && current_start_verse.is_none() {
                             current_start_verse = Some(verse_number);
                         }
                         
@@ -315,16 +318,23 @@ impl BibleService {
                                     verse: verse_number,
                                     content,
                                 });
-                                last_verse_number = Some(verse_number);
+                                
+                                // Only track last verse number for "tb" version title ranges
+                                if version == "tb" {
+                                    last_verse_number = Some(verse_number);
+                                }
                             }
                         }
                     }
                 }
             }
 
-            if let (Some(title), Some(start_verse)) = (current_title, current_start_verse) {
-                if let Some(last_verse) = last_verse_number {
-                    titles_with_ranges.push(format!("{} ({}-{})", title, start_verse, last_verse));
+            // Only finalize title ranges for "tb" version
+            if version == "tb" {
+                if let (Some(title), Some(start_verse)) = (current_title, current_start_verse) {
+                    if let Some(last_verse) = last_verse_number {
+                        titles_with_ranges.push(format!("{} ({}-{})", title, start_verse, last_verse));
+                    }
                 }
             }
         }
@@ -333,9 +343,11 @@ impl BibleService {
             return Err(AppError::NotFound("No verses found in chapter".to_string()));
         }
 
-        if titles_with_ranges.is_empty() {
+        // Only add default title for "tb" version if no titles were found
+        if version == "tb" && titles_with_ranges.is_empty() {
             titles_with_ranges.push(format!("{} {}", indonesian_book_name, chapter));
         }
+        // For non-"tb" versions, leave titles_with_ranges empty
 
         Ok(BibleChapter {
             book: vec![indonesian_book_name],

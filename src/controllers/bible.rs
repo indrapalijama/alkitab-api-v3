@@ -3,6 +3,11 @@ use actix_web::{get, web, HttpResponse};
 use crate::models::bible::{BibleMetadata, BibleChapter, ErrorResponse};
 use crate::services::bible;
 use crate::error::AppError;
+use serde::Deserialize;
+#[derive(Deserialize)]
+pub struct QueryParams {
+    version: Option<String>,
+}
 
 #[utoipa::path(
     get,
@@ -45,9 +50,13 @@ pub async fn find(path: web::Path<String>) -> Result<HttpResponse, AppError> {
     )
 )]
 #[get("/read/{book}/{chapter}")]
-pub async fn read(path: web::Path<(String, i32)>) -> Result<HttpResponse, AppError> {
+pub async fn read(
+    path: web::Path<(String, i32)>,
+    query: web::Query<QueryParams>,
+) -> Result<HttpResponse, AppError> {
     let (book, chapter) = path.into_inner();
     let book = book.trim().to_string();
-    let result = bible::read(&book, chapter).await?;
+    let version = query.version.as_deref().unwrap_or("tb");
+    let result = bible::read(&book, chapter, version).await?;
     Ok(HttpResponse::Ok().json(result))
 }
